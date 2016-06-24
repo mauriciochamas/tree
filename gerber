@@ -1,0 +1,46 @@
+ger <- gerber
+table(ger$voting)
+108696/(108696+235388)
+names(ger)
+table(ger$hawthorne,ger$voting)
+table(ger$civicduty,ger$voting)
+table(ger$neighbors,ger$voting)
+table(ger$self,ger$voting)
+tapply(ger$voting,ger$hawthorne,mean)
+tapply(ger$voting,ger$civicduty,mean)
+tapply(ger$voting,ger$neighbors,mean)
+tapply(ger$voting,ger$self,mean)
+13191/(13191+25027)
+25027/(13191+25027)
+mod <- glm(voting~hawthorne+civicduty+neighbors+self,data = ger, family = binomial)
+summary(mod)
+pred <- predict(mod, type = "response")
+table(ger$voting,pred>0.3)
+(134513+51966)/344084
+235388/344084
+table(ger$voting)
+library(ROCR)
+Rpred <- prediction(pred,ger$voting)
+as.numeric(performance(Rpred,"auc")@y.values)
+#create a regression tree. Don't set the option method="class"
+# If we used method=‘class’, CART would only split if one of the groups had a probability 
+# of voting above 50% and the other had a probability of voting less than 50% (since the 
+# predicted outcomes would be different). However, with regression trees, CART will split 
+#even if both groups have probability less than 50%.
+library(rpart)
+library(rpart.plot)
+tree1 <- rpart(voting ~ civicduty + hawthorne + self + neighbors, data=ger)
+prp(tree1)
+tree2 <- rpart(voting ~ civicduty + hawthorne + self + neighbors+sex, data=ger, cp=0.0)
+prp(tree2)
+tree3 <- rpart(voting ~ control, data=ger, cp=0.0)
+prp(tree3,digits = 6)
+tree4 <- rpart(voting ~ control+sex, data=ger, cp=0.0)
+prp(tree4,digits = 6)
+mod <- glm(voting~sex+control,data= ger, family = binomial)
+summary(mod)
+poss <- data.frame(sex=c(0,0,1,1),control=c(0,1,0,1))
+predict(mod,newdata = poss,type = "response")
+mod2 <- glm(voting~control+sex+sex:control,data = ger,family = "binomial")
+summary(mod2)
+predict(mod2,newdata = poss,type = "response")
